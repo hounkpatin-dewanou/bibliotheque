@@ -61,14 +61,20 @@ composer install
 <p><em>Note sur le .env :</em> La configuration par défaut utilise : <code>DATABASE_URL="mysql://root:@127.0.0.1:3306/bibliotheque?serverVersion=mariadb-10.4.32&charset=utf8mb4"</code></p>
 
 # Génération des clés JWT (Plus rapide et simple avec Git Bash)
-php bin/console lexik:jwt:generate-keypair
+Générer la clé privée :
+Tapez cette commande dans votre terminal: openssl genrsa -out config/jwt/private.pem -aes256 4096
+# Tapez "librairie123" quand on vous demande la passphrase
+Générer la clé publique :
+Tapez cette commande dans votre terminal: openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+# Tapez encore "librairie123"
 
 # Création de la base de données et des tables
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 
 # Lancement du serveur
-symfony serve -d
+symfony serve 
+Symfony tourne sur: http://127.0.0.1:8000/
 </pre>
 
 <h3>4. Configuration du Frontend (Next.js)</h3>
@@ -82,6 +88,8 @@ npm install
 
 # Lancement du projet
 npm run dev
+
+Le backend et le frontend tournent maintenant, vous pouvez vous diriger sur le lien du frontend: http://localhost:3000/ pour suivre les travaux
 </pre>
 
 <hr />
