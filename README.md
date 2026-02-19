@@ -1,5 +1,6 @@
 Plateforme de Gestion de Bibliothèque
-Bienvenue sur le dépôt du projet de gestion de bibliothèque. Cette application est une solution complète permettant de gérer des ouvrages, des utilisateurs et des emprunts, développée dans un délai de 48 heures.
+Bienvenue sur le dépôt du projet de gestion de bibliothèque. Cette application est une solution complète permettant de gérer des ouvrages, des utilisateurs et des emprunts.
+
 Fonctionnalités principales
 Espace Usager (Rôle : ROLE_USER)
 •	Recherche de livres : Moteur de recherche dynamique par titre avec filtrage en temps réel.
