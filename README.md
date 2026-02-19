@@ -2,7 +2,7 @@ Plateforme de Gestion de Bibliothèque
 Bienvenue sur le dépôt du projet de gestion de bibliothèque. Cette application est une solution complète permettant de gérer des ouvrages, des utilisateurs et des emprunts.
 
 Fonctionnalités principales
-Espace Usager (Rôle : ROLE_USER)
+Espace Usager (Rôle : ROLE_USER) <br>
 •	Recherche de livres : Moteur de recherche dynamique par titre avec filtrage en temps réel.
 •	Demandes d'emprunt : Système de réservation instantané pour les ouvrages disponibles.
 •	Sécurité : Accès protégé par un Layout Next.js (Route Groups) et gestion de session via JWT.
