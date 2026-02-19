@@ -34,7 +34,7 @@
 
 <hr />
 
-<h2>Installation et Lancement</h2>
+<h2>Installation et Lancement ~| Utilisez votre CMD ou Git Bash sera encore mieux</h2>
 
 <h3>1. Prérequis</h3>
 <ul>
@@ -57,7 +57,10 @@ cd bibliotheque-backend
 # Installation des dépendances
 composer install
 
-# Génération des clés JWT
+# Copier le fichier .env et renommez-le en .env.local et configurez toutes vos variables d'environnement
+<p><em>Note sur le .env :</em> La configuration par défaut utilise : <code>DATABASE_URL="mysql://root:@127.0.0.1:3306/bibliotheque?serverVersion=mariadb-10.4.32&charset=utf8mb4"</code></p>
+
+# Génération des clés JWT (Plus rapide et simple avec Git Bash)
 php bin/console lexik:jwt:generate-keypair
 
 # Création de la base de données et des tables
@@ -67,7 +70,6 @@ php bin/console doctrine:migrations:migrate
 # Lancement du serveur
 symfony serve -d
 </pre>
-<p><em>Note sur le .env :</em> La configuration par défaut utilise : <code>DATABASE_URL="mysql://root:@127.0.0.1:3306/bibliotheque?serverVersion=mariadb-10.4.32&charset=utf8mb4"</code></p>
 
 <h3>4. Configuration du Frontend (Next.js)</h3>
 <pre>
@@ -76,8 +78,7 @@ cd ../bibliotheque-frontend
 # Installation des dépendances
 npm install
 
-# Configuration de l'environnement (créer .env.local)
-# NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
+# Configuration de l'environnement
 
 # Lancement du projet
 npm run dev
