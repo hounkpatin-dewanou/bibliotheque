@@ -2,10 +2,10 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
-import UserForm, { UserFormData } from '@/components/admin/UserForm';
+import EmpruntForm, { EmpruntFormData } from '@/components/admin/EmpruntForm';
 import { toast, Toaster } from 'react-hot-toast';
 import { AxiosError } from 'axios';
 
@@ -13,66 +13,64 @@ interface ApiPlatformError {
   'hydra:description'?: string;
 }
 
-// Interface stricte pour le payload (on remplace Record<string, any>)
-interface UserUpdatePayload {
-  nom: string;
-  prenom: string;
-  email: string;
-  telephone: string;
-  roles: string[];
-  isVerified: boolean;
-  password?: string; // Optionnel : envoyé seulement si rempli
-}
-
-export default function EditUser({ params }: { params: Promise<{ id: string }> }) {
+export default function EditEmprunt({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const [initialData, setInitialData] = useState<UserFormData | null>(null);
+  
+  const [initialData, setInitialData] = useState<EmpruntFormData | null>(null);
   const [fetching, setFetching] = useState(true);
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    axiosInstance.get(`/utilisateurs/${id}`)
-      .then(res => {
-        setInitialData({
-          nom: res.data.nom,
-          prenom: res.data.prenom,
-          email: res.data.email,
-          telephone: res.data.telephone || '',
-          roles: res.data.roles,
-          verified: res.data.verified ?? res.data.isVerified ?? false,
-          password: '' 
-        });
-      })
-      .catch(() => toast.error("Erreur de chargement de l'utilisateur"))
-      .finally(() => setFetching(false));
-  }, [id]);
+    const loadEmprunt = async () => {
+      try {
+        setFetching(true);
+        const res = await axiosInstance.get(`/emprunts/${id}`);
+        const data = res.data;
 
-  const handleUpdate = async (formData: UserFormData) => {
-    setUpdating(true);
-    
-    // Construction du payload typé
-    const payload: UserUpdatePayload = {
-      nom: formData.nom,
-      prenom: formData.prenom,
-      email: formData.email,
-      telephone: formData.telephone,
-      roles: formData.roles,
-      isVerified: formData.verified,
+        // On transforme les données reçues en format attendu par le formulaire (IRIs)
+        setInitialData({
+  usagerId: typeof data.usager === 'string' ? data.usager : `/api/utilisateurs/${data.usager.id}`,
+  livreId: typeof data.livre === 'string' ? data.livre : `/api/livres/${data.livre.id}`,
+  dateDebut: data.dateDebut.split('T')[0],
+  dateFinPrevue: data.dateFinPrevue.split('T')[0],
+  nbExemplaires: data.nbExemplaires,
+  accordee: data.accordee, // On récupère l'état actuel (true, false ou null)
+});
+      } catch (err) {
+        toast.error("Impossible de charger les données de l'emprunt");
+      } finally {
+        setFetching(false);
+      }
     };
 
-    // On n'ajoute le password que s'il y a une valeur saisie
-    if (formData.password && formData.password.trim() !== '') {
-      payload.password = formData.password;
-    }
+    loadEmprunt();
+  }, [id]);
+
+  const handleUpdate = async (formData: EmpruntFormData) => {
+    setUpdating(true);
+    
+    // Payload pour la mise à jour
+    const payload = {
+      usager: formData.usagerId,
+      livre: formData.livreId,
+      dateDebut: formData.dateDebut,
+      dateFinPrevue: formData.dateFinPrevue,
+      nbExemplaires: formData.nbExemplaires,
+      accordee: formData.accordee,
+    };
 
     try {
-      await axiosInstance.patch(`/utilisateurs/${id}`, payload, {
-        headers: { 'Content-Type': 'application/merge-patch+json' }
+      // 1. On passe en .patch
+      // 2. On ajoute le header spécifique requis par API Platform pour le PATCH
+      await axiosInstance.patch(`/emprunts/${id}`, payload, {
+        headers: {
+          'Content-Type': 'application/merge-patch+json',
+        },
       });
       
-      toast.success("Profil mis à jour avec succès !");
-      setTimeout(() => router.push('/admin/utilisateurs'), 1500);
+      toast.success("MISE À JOUR RÉUSSIE");
+      setTimeout(() => router.push('/admin/emprunts'), 1500);
     } catch (err) {
       const error = err as AxiosError<ApiPlatformError>;
       toast.error(error.response?.data?.['hydra:description'] || "Erreur lors de la modification");
@@ -81,32 +79,41 @@ export default function EditUser({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  if (fetching) {
-    return (
-      <div className="flex flex-col justify-center items-center p-20 space-y-4">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-        <p className="text-gray-500 font-bold italic uppercase tracking-tighter">Récupération des données...</p>
-      </div>
-    );
-  }
+  if (fetching) return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <Loader2 className="animate-spin text-blue-600" size={40} />
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Récupération du dossier...</p>
+    </div>
+  );
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8 animate-in fade-in duration-500">
-      <Toaster position="top-right" />
-      <Link href="/admin/utilisateurs" className="flex items-center gap-2 text-gray-400 hover:text-blue-600 font-bold group transition-colors">
-        <ArrowLeft size={20} className="group-hover:-translate-x-2 transition-transform" /> 
-        RETOUR AU DASHBOARD
-      </Link>
+    <div className="max-w-5xl mx-auto p-8 space-y-12 animate-in fade-in duration-500">
+      <Toaster position="bottom-right" />
       
-      <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-gray-100">
-        <header className="mb-8">
-          <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter leading-none">
-            Modifier l&apos;utilisateur
+      <div className="flex flex-col gap-4">
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-2 text-gray-400 hover:text-black font-black text-[10px] tracking-widest uppercase transition-all w-fit cursor-pointer"
+        >
+          <ArrowLeft size={14} /> Retour
+        </button>
+        
+        <div className="relative">
+          <span className="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-12 bg-amber-500 rounded-full" />
+          <h1 className="text-2xl font-black text-black uppercase tracking-tighter leading-none">
+            Modifier l&apos;emprunt<br />
           </h1>
-          <p className="text-gray-400 font-medium mt-2">ID: {id}</p>
-        </header>
+        </div>
+      </div>
 
-        {initialData && <UserForm initialData={initialData} onSubmit={handleUpdate} isLoading={updating} />}
+      <div className="bg-white rounded-[3rem] shadow-2xl shadow-gray-100/50 border border-gray-50">
+        {initialData && (
+          <EmpruntForm 
+            initialData={initialData} 
+            onSubmit={handleUpdate} 
+            isSubmitting={updating} 
+          />
+        )}
       </div>
     </div>
   );

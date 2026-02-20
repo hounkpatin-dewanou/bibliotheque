@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, HelpCircle, Grid } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, HelpCircle, Grid, LogOut, User } from 'lucide-react';
 
 const menuItems = [
   { label: 'Accueil', href: '/admin' },
@@ -14,7 +14,20 @@ const menuItems = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login'); // Ajuste le chemin selon ta route de login
+  };
+
+  // Fonction pour vérifier si le lien est actif (gestion des sous-pages)
+  const isActive = (href: string) => {
+    if (href === '/admin') return pathname === '/admin';
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-2 shadow-sm">
@@ -37,8 +50,8 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                pathname === item.href 
-                ? 'bg-blue-100 text-blue-600 shadow-md' 
+                isActive(item.href) 
+                ? 'bg-blue-100 text-blue-600 shadow-sm' 
                 : 'text-blue-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
@@ -48,16 +61,38 @@ export default function Navbar() {
         </div>
 
         {/* Droite : Icons + Profil */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative">
           <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full hidden sm:block transition-colors">
             <HelpCircle size={24} />
           </button>
           <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full hidden sm:block transition-colors">
             <Grid size={24} />
           </button>
-          <div className="h-10 w-10 bg-blue-600 rounded-full border-2 border-gray-200 flex items-center justify-center text-white font-bold ml-2 shadow-md">
+          
+          {/* Bouton Profil avec Initiales */}
+          <button 
+            onClick={() => setShowProfile(!showProfile)}
+            className="h-10 w-10 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white font-bold ml-2 shadow-md hover:bg-blue-700 transition-all cursor-pointer overflow-hidden"
+          >
             A
-          </div>
+          </button>
+
+          {/* Carte de déconnexion (Dropdown) */}
+          {showProfile && (
+            <>
+              {/* Overlay pour fermer en cliquant ailleurs */}
+              <div className="fixed inset-0 z-[-1]" onClick={() => setShowProfile(false)}></div>
+              
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl py-3 z-50 animate-in fade-in zoom-in duration-200">                
+                <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium cursor-pointer"
+                >
+                  <LogOut size={18} /> Se déconnecter
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -69,11 +104,13 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className="p-3 text-blue-600 hover:bg-gray-50 rounded-xl transition-colors font-medium"
+              className={`p-3 rounded-xl transition-colors font-medium ${
+                isActive(item.href) ? 'bg-blue-50 text-blue-700' : 'text-blue-600 hover:bg-gray-50'
+              }`}
             >
               {item.label}
-          </Link>
-        ))}
+            </Link>
+          ))}
         </div>
       )}
     </nav>

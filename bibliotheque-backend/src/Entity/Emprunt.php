@@ -10,8 +10,10 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ApiResource( // Affichage des utilisateurs sur le serveur Swagger UI
     paginationEnabled: false, // Désactive la pagination pour cette entité
-    order: ['dateDebut' => 'DESC'] // Optionnel : trie du plus récent au plus ancien
+    order: ['dateDebut' => 'DESC'], // Optionnel : trie du plus récent au plus ancien
+
 )]
+
 #[ApiFilter(SearchFilter::class, properties: ['utilisateur' => 'exact'])]
 #[ORM\Entity(repositoryClass: EmpruntRepository::class)]
 class Emprunt
