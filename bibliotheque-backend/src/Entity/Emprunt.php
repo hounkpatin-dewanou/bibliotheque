@@ -5,8 +5,14 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EmpruntRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
-#[ApiResource] // Affichage des utilisateurs sur le serveur Swagger UI
+#[ApiResource( // Affichage des utilisateurs sur le serveur Swagger UI
+    paginationEnabled: false, // Désactive la pagination pour cette entité
+    order: ['dateDebut' => 'DESC'] // Optionnel : trie du plus récent au plus ancien
+)]
+#[ApiFilter(SearchFilter::class, properties: ['utilisateur' => 'exact'])]
 #[ORM\Entity(repositoryClass: EmpruntRepository::class)]
 class Emprunt
 {
@@ -25,12 +31,19 @@ class Emprunt
     private ?\DateTimeImmutable $dateRetourEffective = null;
 
     #[ORM\ManyToOne(inversedBy: 'emprunts')]
+    #[ORM\JoinColumn(name: "usager_id", referencedColumnName: "id", nullable: false)] // Force le nom de la colonne
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $usager = null;
 
     #[ORM\ManyToOne(inversedBy: 'emprunts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Livre $livre = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $accordee = null;
+
+    #[ORM\Column]
+    private ?int $nb_exemplaires = null;
 
     public function getId(): ?int
     {
@@ -93,6 +106,30 @@ class Emprunt
     public function setLivre(?Livre $livre): static
     {
         $this->livre = $livre;
+
+        return $this;
+    }
+
+    public function isAccordee(): ?bool
+    {
+        return $this->accordee;
+    }
+
+    public function setAccordee(?bool $accordee): static
+    {
+        $this->accordee = $accordee;
+
+        return $this;
+    }
+
+    public function getNbExemplaires(): ?int
+    {
+        return $this->nb_exemplaires;
+    }
+
+    public function setNbExemplaires(int $nb_exemplaires): static
+    {
+        $this->nb_exemplaires = $nb_exemplaires;
 
         return $this;
     }

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import Link from 'next/link';
+import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'; // Ajout d'icônes
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,6 +17,52 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+// 1. Modifie ce useEffect précis
+useEffect(() => {
+  // On vérifie si on est bien côté client pour éviter le warning de rendu en cascade
+  const loadUser = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payloadBase64 = token.split('.')[1];
+        if (payloadBase64) {
+          const decodedPayload = JSON.parse(atob(payloadBase64));
+          // On n'appelle le state que si la valeur est différente pour éviter les renders inutiles
+          if (decodedPayload.username) {
+            setUserEmail(decodedPayload.username);
+          }
+        }
+      } catch (e) {
+        console.error("Erreur décodage token", e);
+      }
+    }
+  };
+
+  loadUser();
+}, []); // S'exécute une seule fois au montage
+
+
+  // Fermer le menu si on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user'); // Au cas où tu stockes les infos user
+    router.push('/login');
+  };
 
   useEffect(() => {
   const sections = ['accueil', 'apropos', 'bibliotheque'];
@@ -71,7 +117,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* LOGO avec next/image */}
-          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
+          <Link href="/recherche" className="flex items-center gap-3 cursor-pointer group">
             <div className="relative h-12 w-12 transition-transform duration-300 group-hover:scale-110">
               <Image 
                 src="/logo_wbg.png" 
@@ -115,19 +161,50 @@ export default function Navbar() {
     </Link>
   );
 })}
+{/* --- SECTION PROFIL UTILISATEUR --- */}
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className={cn(
+                  "h-12 w-12 rounded-full flex items-center justify-center transition-all border-2 cursor-pointer overflow-hidden",
+                  isScrolled ? "border-slate-200 bg-slate-50" : "border-slate-300 bg-white/20 backdrop-blur-sm"
+                )}
+              >
+                <User className={cn(isScrolled ? "text-slate-600" : "text-slate-900")} size={24} />
+              </button>
 
-            <Link
-              href="/emprunts"
-              className={cn(
-                "px-8 py-3 rounded-full font-bold text-sm transition-all duration-300 shadow-xl hover:-translate-y-1 active:scale-95 cursor-pointer",
-                isScrolled 
-                  ? "bg-blue-600 text-slate-900 hover:bg-blue-700 shadow-blue-200" 
-                  : "bg-white text-blue-600 hover:bg-slate-50"
+              {/* CARD DROPDOWN */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-4 w-64 bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="px-4 py-3 border-b border-slate-50 mb-2">
+                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Connecté en tant que</p>
+                    <p className="text-sm font-bold text-slate-800 truncate">{userEmail}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Link 
+                      href="/dashboard" 
+                      className="flex items-center gap-3 w-full p-3 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors font-bold text-sm"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <LayoutDashboard size={18} />
+                      Mon Dashboard
+                    </Link>
+                    
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors font-bold text-sm cursor-pointer"
+                    >
+                      <LogOut size={18} />
+                      Se déconnecter
+                    </button>
+                  </div>
+                </div>
               )}
-            >
-              Emprunter
-            </Link>
+            </div>
+
           </div>
+          
 
           {/* BOUTON MOBILE */}
           <button 
@@ -141,6 +218,7 @@ export default function Navbar() {
             )}
           </button>
         </div>
+        
       </nav>
 
       {/* MENU MOBILE MODERNE (Overlay) */}

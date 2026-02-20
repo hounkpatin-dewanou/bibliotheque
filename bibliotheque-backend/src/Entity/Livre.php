@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LivreRepository::class)]
 #[ApiResource( // Affichage des utilisateurs sur le serveur Swagger UI
-    paginationEnabled: false, // <--- C'EST CETTE LIGNE QUI CHANGE TOUT
+    paginationEnabled: false,
     order: ['id' => 'DESC']    // <--- CELA METTRA "L'ANOMALIE" EN HAUT
 )]
 class Livre

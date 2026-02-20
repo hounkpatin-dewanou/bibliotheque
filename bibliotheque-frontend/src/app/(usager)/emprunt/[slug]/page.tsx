@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/user/NavbarUsager';
 import axiosInstance from '@/lib/axios';
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 interface LivreData {
   id: number;
@@ -31,6 +31,55 @@ interface LivreData {
   nb_pages: number;
   langue: string;
   nb_exemplaires: number;
+}
+
+interface ApiUserResponse {
+  'hydra:member': Array<{
+    id: number;
+    email: string;
+  }>;
+}
+
+interface ApiError {
+  detail?: string;
+  message?: string;
+}
+
+interface UtilisateurMember {
+  "@id": string;
+  id: number;
+  email: string;
+}
+
+interface UtilisateurCollection {
+  "hydra:member": UtilisateurMember[];
+}
+
+interface Utilisateur {
+  id: number;
+  email: string;
+  // Ajoute d'autres champs si nécessaire pour d'autres usages
+}
+
+interface HydraResponse {
+  "hydra:member": Utilisateur[];
+  "hydra:totalItems"?: number;
+}
+
+interface DecodedToken {
+  username?: string;
+  email?: string;
+  roles?: string[];
+  exp?: number;
+}
+
+interface ApiError {
+  detail?: string;
+  title?: string;
+}
+
+interface ApiError {
+  detail?: string;
 }
 
 export default function FormulaireEmprunt() {
@@ -75,35 +124,76 @@ export default function FormulaireEmprunt() {
     fetchLivre();
   }, [bookId, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bookId || !livre) return;
+  const [dates, setDates] = useState({ debut: '', fin: '' });
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    setStatusMsg({ type: 'error', text: "Session manquante." });
+    return;
+  }
+
+  setSubmitting(true);
+  setStatusMsg(null);
+
+  try {
+    // 1. Décodage du Token
+    const payloadBase64 = token.split('.')[1];
+    const decodedToken = JSON.parse(atob(payloadBase64)) as DecodedToken;
+    const userEmail = decodedToken.username || decodedToken.email;
+
+    // 2. Appel API avec Header explicite pour éviter les surprises
+    const response = await axiosInstance.get('/utilisateurs', {
+      headers: { 'Accept': 'application/ld+json' }
+    });
     
-    if (quantite > livre.nb_exemplaires) {
-      setStatusMsg({ type: 'error', text: `Seulement ${livre.nb_exemplaires} exemplaires disponibles.` });
-      return;
+    // 3. Extraction ultra-flexible des données
+    // On cherche dans hydra:member, sinon dans member, sinon on prend le body direct
+    const rawData = response.data;
+    const membres = rawData["hydra:member"] || rawData["member"] || (Array.isArray(rawData) ? rawData : null);
+
+    if (!membres || !Array.isArray(membres)) {
+      console.error("Structure reçue inconnue :", rawData);
+      throw new Error("Le format de réponse de l'API est invalide.");
     }
 
-    setSubmitting(true);
-    setStatusMsg(null);
+    // 4. Recherche de l'utilisateur
+    const currentUser = membres.find((u: Utilisateur) => u.email === userEmail);
 
-    try {
-      await axiosInstance.post('/emprunts', {
-        livre: `/api/livres/${bookId}`,
-        nbExemplaires: quantite,
-        dateDemande: new Date().toISOString(),
-        statut: 'en_attente'
-      });
-      
-      setStatusMsg({ type: 'success', text: "Demande d'emprunt enregistrée ! Redirection..." });
-      setTimeout(() => router.push('/recherche'), 2500);
-    } catch (err) {
-      const error = err as AxiosError<{ message?: string }>;
-      setStatusMsg({ type: 'error', text: error.response?.data?.message || "Erreur lors de l'envoi." });
-    } finally {
-      setSubmitting(false);
+    if (!currentUser) {
+      throw new Error(`Utilisateur ${userEmail} non trouvé dans la liste.`);
     }
-  };
+
+    // 5. Envoi du POST
+    const payload = {
+      livre: `/api/livres/${bookId}`,
+      usager: `/api/utilisateurs/${currentUser.id}`,
+      dateDebut: dates.debut,
+      dateFinPrevue: dates.fin,
+      nbExemplaires: quantite,
+      accordee: null
+    };
+
+    await axiosInstance.post('/emprunts', payload);
+    
+    setStatusMsg({ type: 'success', text: "Demande enregistrée !" });
+    setTimeout(() => router.push('/dashboard'), 2000);
+
+  } catch (err) {
+    let errorMsg = "Erreur système.";
+    if (axios.isAxiosError<ApiError>(err)) {
+      errorMsg = err.response?.data?.detail || err.message;
+    } else if (err instanceof Error) {
+      errorMsg = err.message;
+    }
+    setStatusMsg({ type: 'error', text: errorMsg });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading) return (
     <div className="h-screen flex items-center justify-center bg-white">
@@ -231,10 +321,31 @@ export default function FormulaireEmprunt() {
               </p>
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+  <div className="space-y-2">
+    <label className="text-xs font-bold text-slate-700 uppercase">Date de début</label>
+    <input 
+      type="date" 
+      required
+      className="w-full p-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-bold"
+      onChange={(e) => setDates({...dates, debut: e.target.value})}
+    />
+  </div>
+  <div className="space-y-2">
+    <label className="text-xs font-bold text-slate-700 uppercase">Retour prévu</label>
+    <input 
+      type="date" 
+      required
+      className="w-full p-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-bold"
+      onChange={(e) => setDates({...dates, fin: e.target.value})}
+    />
+  </div>
+</div>
+
             <button 
               type="submit" 
               disabled={submitting || livre.nb_exemplaires === 0}
-              className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer"
             >
               {submitting ? (
                 <Loader2 className="animate-spin h-5 w-5" />
@@ -246,7 +357,7 @@ export default function FormulaireEmprunt() {
 
           <div className="pt-6 text-center">
             <p className="text-slate-400 text-xs font-medium">
-              Besoin d&apos;aide ? <Link href="/faq" className="text-blue-600 font-bold hover:underline">Contactez le support</Link>
+              <Link href="/recharche" className="text-blue-600 font-bold hover:underline">Retour Bibliothèque</Link>
             </p>
           </div>
         </div>

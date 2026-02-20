@@ -36,10 +36,25 @@ export default function LoginPage() {
     try {
       const response = await axiosInstance.post('/login_check', credentials);
       const token = response.data.token;
+      localStorage.setItem('token', token);
       
       localStorage.setItem('token', token);
 
       try {
+          
+        // --- NOUVEAU : Récupérer l'ID de l'utilisateur ---
+    // On appelle l'endpoint qui liste les utilisateurs en filtrant par email
+    // Ou si tu as un endpoint /api/me c'est encore mieux. 
+    // Ici on cherche l'utilisateur par son email :
+    const userRes = await axiosInstance.get(`/utilisateurs?email=${credentials.email}`);
+    
+    // API Platform renvoie un tableau dans 'hydra:member' ou 'member'
+    const userData = userRes.data['hydra:member']?.[0] || userRes.data[0];
+
+    if (userData && userData.id) {
+      // On stocke l'objet utilisateur complet (avec l'ID !)
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
           // On décode la partie "Payload" du JWT (le milieu du token)
           const payloadBase64 = token.split('.')[1];
           const decodedPayload = JSON.parse(atob(payloadBase64));
