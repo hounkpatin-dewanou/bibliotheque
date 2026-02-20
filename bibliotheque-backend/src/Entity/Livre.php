@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: LivreRepository::class)]
 #[ApiResource( // Affichage des utilisateurs sur le serveur Swagger UI
     paginationEnabled: false,
-    order: ['id' => 'DESC']    // <--- CELA METTRA "L'ANOMALIE" EN HAUT
+    order: ['id' => 'DESC']
 )]
 class Livre
 {
@@ -57,7 +57,7 @@ class Livre
     #[ORM\Column]
     private ?int $nb_exemplaires = null;
 
-    // ... (garder les propriétés et le début de la classe)
+    // (garder les propriétés et le début de la classe)
 
     public function setAnneePublication(int $annee_publication): static
     {

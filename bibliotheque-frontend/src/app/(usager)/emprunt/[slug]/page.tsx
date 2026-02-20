@@ -58,7 +58,6 @@ interface UtilisateurCollection {
 interface Utilisateur {
   id: number;
   email: string;
-  // Ajoute d'autres champs si nécessaire pour d'autres usages
 }
 
 interface HydraResponse {

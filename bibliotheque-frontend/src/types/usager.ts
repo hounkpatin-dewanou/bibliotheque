@@ -5,6 +5,5 @@ export interface IUsager {
   email: string;
   telephone?: string;
   adresse?: string;
-  dateInscription?: string; // Format ISO
-  // Ajoute d'autres champs selon ton entité Symfony
+  dateInscription?: string; 
 }

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import { AxiosError } from 'axios';
 
-// Définition de l'interface pour la réponse d'erreur de ton API
+// Définition de l'interface
 interface ApiErrorResponse {
   message?: string;
 }

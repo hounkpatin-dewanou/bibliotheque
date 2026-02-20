@@ -5,7 +5,7 @@ import Navbar from '@/components/user/NavbarUsager';
 import { Loader2, BookOpen, Clock, CheckCircle2, AlertCircle, Calendar, Hash, User } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 
-// --- INTERFACES COMPLÈTES ---
+// INTERFACES 
 interface Livre {
   id: number;
   titre: string;
@@ -22,7 +22,7 @@ interface Emprunt {
   nbExemplaires: number;
   accordee: boolean | null;
   usager: string | { id: number; email: string };
-  livre: string | Livre; // Peut être un lien (string) ou l'objet complet
+  livre: string | Livre; 
 }
 
 interface HydraData<T> {
@@ -56,9 +56,9 @@ export default function DashboardPage() {
 
         // 1. Récupérer Utilisateurs + Livres + Emprunts en parallèle pour la vitesse
         const [resUsers, resLivres, resEmprunts] = await Promise.all([
-  axiosInstance.get('/utilisateurs?pagination=false'), // Désactive la pagination
-  axiosInstance.get('/livres?pagination=false'),       // Désactive la pagination
-  axiosInstance.get('/emprunts?pagination=false')      // CRUCIAL : récupère tout pour filtrer
+  axiosInstance.get('/utilisateurs?pagination=false'), 
+  axiosInstance.get('/livres?pagination=false'),       
+  axiosInstance.get('/emprunts?pagination=false')      
 ]);
 
         const users = ensureArray<{ id: number; email: string }>(resUsers.data);

@@ -13,7 +13,7 @@ interface ApiPlatformError {
   'hydra:description'?: string;
 }
 
-// Interface stricte pour le payload (on remplace Record<string, any>)
+// Interface stricte pour le payload 
 interface UserUpdatePayload {
   nom: string;
   prenom: string;

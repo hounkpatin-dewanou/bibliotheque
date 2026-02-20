@@ -15,7 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Le Coin Lecture",
   description: "Votre bibliothèque nationale numérique",
-  // C'est ici que la magie opère pour les favicons :
   icons: {
     icon: [
       { url: "favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },

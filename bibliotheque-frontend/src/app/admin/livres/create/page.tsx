@@ -6,7 +6,7 @@ import { ArrowLeft, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import LivreForm from '@/components/admin/LivreForm';
 import { ILivre } from '@/types/livre';
-import axios from 'axios'; // Import direct pour éviter les headers JSON-LD d'axiosInstance
+import axios from 'axios'; 
 
 
 export default function CreateLivrePage() {
@@ -16,16 +16,13 @@ export default function CreateLivrePage() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // app/admin/livres/create/page.tsx
-    // app/admin/livres/create/page.tsx
-    // app/admin/livres/create/page.tsx
+  
 const handleCreate = async (data: ILivre) => {
   setSubmitting(true);
   try {
-    // Dans handleCreate (create/page.tsx)
 const formData = new FormData();
 formData.append('titre', data.titre);
-formData.append('auteur', data.auteur); // INDISPENSABLE
+formData.append('auteur', data.auteur); 
 formData.append('genre', data.genre || '');
 formData.append('description', data.description || '');
 formData.append('annee_publication', String(data.annee_publication));

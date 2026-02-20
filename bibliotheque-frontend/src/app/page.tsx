@@ -174,14 +174,14 @@ export default function Page() {
 
     {/* GRILLE DE LIVRES STATIQUE */}
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-  {/* Tableau de données statiques pour tes 4 livres */}
+  {/* Tableau de données statiques pour les livres */}
   {[
     {
       id: "0001",
       title: "L'Enfant Noir",
       author: "Camara Laye",
       category: "Classique",
-      image: "/book1.jpg", // Remplace par ton image dans public/
+      image: "/book1.jpg", 
     },
     {
       id: "0002",

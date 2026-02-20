@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   User, Mail, Phone, Shield, 
-  CheckCircle2, Save, X, Loader2 
+  CheckCircle2, Save, Loader2 
 } from 'lucide-react';
 
 export interface UserFormData {

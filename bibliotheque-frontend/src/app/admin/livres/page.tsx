@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 
-// Interface calquée exactement sur votre JSON d'API
+// Interface 
 interface Livre {
   id: number;
   titre: string;
@@ -19,7 +19,6 @@ interface Livre {
   nb_pages: number;
   langue: string;
   image: string;
-  // On déclare les deux variantes possibles
   nb_exemplaires?: number; 
   nbExemplaires?: number;
 }
@@ -36,7 +35,7 @@ export default function ListeLivres() {
       setLoading(true);
       const res = await axiosInstance.get('/livres');
       
-      // Extraction cruciale : votre API renvoie { member: [...] }
+      // Extraction cruciale : l'API renvoie { member: [...] }
       const data = res.data.member || [];
       
       setLivres(data);

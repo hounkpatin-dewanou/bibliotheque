@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import Link from 'next/link';
-import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'; // Ajout d'icônes
+import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'; 
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,9 +22,8 @@ export default function Navbar() {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-// 1. Modifie ce useEffect précis
 useEffect(() => {
-  // On vérifie si on est bien côté client pour éviter le warning de rendu en cascade
+  // On vérifie si on est bien côté client
   const loadUser = () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -60,7 +59,7 @@ useEffect(() => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user'); // Au cas où tu stockes les infos user
+    localStorage.removeItem('user'); // Au cas où des infos users sont stockées
     router.push('/login');
   };
 

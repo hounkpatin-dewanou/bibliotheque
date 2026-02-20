@@ -36,8 +36,6 @@ class EmpruntSubscriber implements EventSubscriberInterface
         $user = $this->security->getUser();
 
         if ($user) {
-            // ATTENTION : Vérifie bien que c'est setUsager et non setUtilisateur
-            // par rapport à ton champ usager_id en base de données
             $emprunt->setUsager($user);
         }
 

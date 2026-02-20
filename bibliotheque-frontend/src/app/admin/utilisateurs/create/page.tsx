@@ -35,7 +35,7 @@ export default function EditUser({ params }: { params: Promise<{ id: string }> }
   useEffect(() => {
     axiosInstance.get(`/utilisateurs/${id}`)
       .then(res => {
-        // Typage strict ici aussi pour éviter les surprises
+        // Typage strict ici
         const data = res.data;
         setInitialData({
           nom: data.nom,
@@ -54,7 +54,7 @@ export default function EditUser({ params }: { params: Promise<{ id: string }> }
   const handleUpdate = async (formData: UserFormData) => {
     setUpdating(true);
     
-    // Utilisation de l'interface spécifique au lieu de Record<string, any>
+    // Utilisation de l'interface spécifique 
     const payload: UserUpdatePayload = {
       nom: formData.nom,
       prenom: formData.prenom,

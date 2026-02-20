@@ -7,12 +7,12 @@ import Link from 'next/link';
 import { Search, Loader2, Book as BookIcon, Filter } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 
-// Interface complète selon ta DB
+// Interface 
 interface Livre {
   id: number;
   titre: string;
   auteur: string;
-  est_disponible: boolean; // Adapté à ta structure tinyint
+  est_disponible: boolean;
   description: string;
   genre: string;
   annee_publication: number;

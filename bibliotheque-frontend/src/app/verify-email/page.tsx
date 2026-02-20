@@ -38,7 +38,7 @@ export default function VerifyEmailPage() {
       setTimeout(() => setStatus(null), 8000);
       
     } catch (err) {
-      // Typage de l'erreur Axios sans utiliser 'any'
+      // Typage de l'erreur Axios
       const error = err as AxiosError<{ message?: string }>;
       const errorMessage = error.response?.data?.message || "Impossible de renvoyer l'email pour le moment.";
       

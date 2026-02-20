@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, HelpCircle, Grid, LogOut, User } from 'lucide-react';
+import { Menu, X, HelpCircle, Grid, LogOut } from 'lucide-react';
 
 const menuItems = [
   { label: 'Accueil', href: '/admin' },
@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    router.push('/login'); // Ajuste le chemin selon ta route de login
+    router.push('/login'); 
   };
 
   // Fonction pour vérifier si le lien est actif (gestion des sous-pages)

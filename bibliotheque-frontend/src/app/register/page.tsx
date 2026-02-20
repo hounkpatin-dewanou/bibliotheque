@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
   setIsLoading(true);
   try {
-    const { confirmPassword, ...dataToSend } = formData;
+    const {...dataToSend } = formData;
     
     // On appelle /api/register (une fois que Symfony le reconnaîtra)
     await axiosInstance.post('/register', dataToSend);
@@ -38,7 +38,6 @@ export default function RegisterPage() {
 }, 2000);
 
   } catch (err) {
-    // Suppression du "any" : on type l'erreur
     const error = err as AxiosError<{ message?: string }>;
     console.error("Erreur d'inscription", error);
     
