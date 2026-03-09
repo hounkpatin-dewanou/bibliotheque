@@ -1,13 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Menu, X, ChevronRight, ShieldCheck } from "lucide-react";
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion, AnimatePresence } from "framer-motion";
 
+/**
+ * Utilitaire pour fusionner les classes Tailwind proprement
+ */
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -18,47 +22,47 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // 1. GESTION DU SCROLL : On détecte la position pour le style de la barre
   useEffect(() => {
-  const sections = ['accueil', 'apropos', 'bibliotheque'];
-  
-  const observerOptions = {
-    root: null,
-    rootMargin: '-50% 0px -50% 0px', // Déclenche le changement quand la section est au milieu de l'écran
-    threshold: 0
-  };
-
-  const observerCallback = (entries: IntersectionObserverEntry[]) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        setActiveSection(entry.target.id);
-      }
-    });
-  };
-
-  const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-  sections.forEach((id) => {
-    const element = document.getElementById(id);
-    if (element) observer.observe(element);
-  });
-
-  return () => observer.disconnect();
-}, []);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      // Si on a scrollé de plus de 20px, on active l'état "scrolled"
+      setIsScrolled(window.scrollY > 20);
+    };
+    
+    // On l'exécute une fois au montage pour éviter le bug du refresh
+    handleScroll();
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Désactiver le scroll du corps quand le menu mobile est ouvert
+  // 2. OBSERVATEUR DE SECTIONS : Pour allumer les liens au scroll
+  useEffect(() => {
+    const sections = ['accueil', 'apropos', 'bibliotheque'];
+    const observerOptions = { root: null, rootMargin: '-40% 0px', threshold: 0 };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActiveSection(entry.target.id);
+      });
+    }, observerOptions);
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 3. LOCK DU SCROLL : Empêche de scroller la page quand le menu mobile est ouvert
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset';
   }, [isMobileMenuOpen]);
 
   const navLinks = [
     { name: 'Accueil', href: '#accueil' },
-    { name: 'A propos', href: '#apropos' },
+    { name: 'À propos', href: '#apropos' },
     { name: 'Bibliothèque', href: '#bibliotheque' },
     { name: 'Connexion', href: '/login' },
   ];
@@ -67,14 +71,20 @@ export default function Navbar() {
     <>
       <nav
         className={cn(
-          'fixed top-0 w-full z-50 transition-all duration-500 ease-in-out px-6 py-4',
-          isScrolled ? 'bg-white shadow-lg py-3' : 'bg-transparent'
+          'fixed top-0 w-full z-50 transition-all duration-500 px-6 py-4',
+          // Correction du fond : On ajoute un backdrop-blur pour la modernité
+          isScrolled 
+            ? 'bg-white backdrop-blur-md shadow-sm py-3 border-b border-slate-100' 
+            : 'bg-transparent'
         )}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          {/* LOGO avec next/image */}
-          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative h-12 w-12 transition-transform duration-300 group-hover:scale-110">
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <motion.div 
+              whileHover={{ scale: 1.1 }}
+              className="relative h-10 w-10 md:h-12 md:w-12"
+            >
               <Image 
                 src="/logo_wbg.png" 
                 alt="Le Coin Lecture" 
@@ -82,112 +92,129 @@ export default function Navbar() {
                 className="object-contain"
                 priority
               />
-            </div>
+            </motion.div>
             <span className={cn(
-              "font-bold text-2xl tracking-tighter transition-colors duration-300",
+              "font-black text-xl md:text-2xl tracking-tighter transition-colors duration-300",
               isScrolled ? "text-slate-900" : "text-white"
             )}>
               Le Coin Lecture
             </span>
           </Link>
 
-          {/* LIENS DESKTOP */}
-          <div className="hidden md:flex items-center gap-10">
+          {/* NAVIGATION DESKTOP */}
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => {
-  // On vérifie si la section est active (ex: "#apropos" devient "apropos")
-  const isActive = activeSection === link.href.replace('#', '');
-  
-  return (
-    <Link
-      key={link.name}
-      href={link.href}
-      className={cn(
-        "relative text-lg font-semibold transition-colors duration-300 py-2 hover:text-blue-600",
-        // Couleur bleue si actif, sinon blanc/noir selon le scroll
-        isActive ? "text-blue-600" : (isScrolled ? "text-slate-900" : "text-white")
-      )}
-    >
-      {link.name}
-      {/* La barre qui se souligne de gauche à droite */}
-      <span className={cn(
-        "absolute bottom-0 left-0 h-[3px] transition-all duration-300 ease-out bg-blue-600",
-        // Si actif, largeur 100%, sinon 0% (et 100% au survol group-hover)
-        isActive ? "w-full" : "w-0 group-hover:w-full"
-      )} />
-    </Link>
-  );
-})}
+              const isActive = activeSection === link.href.replace('#', '');
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={cn(
+                    "group relative text-sm font-bold tracking-widest transition-colors duration-300",
+                    isActive ? "text-blue-600" : (isScrolled ? "text-slate-600" : "text-white/80")
+                  )}
+                >
+                  {link.name}
+                  <span className={cn(
+                    "absolute -bottom-1 left-0 h-[2px] bg-blue-600 transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  )} />
+                </Link>
+              );
+            })}
 
             <Link
               href="/register"
               className={cn(
-                "px-8 py-3 rounded-full font-bold text-sm transition-all duration-300 shadow-xl hover:-translate-y-1 active:scale-95 cursor-pointer",
+                "px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300",
                 isScrolled 
-                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200" 
-                  : "bg-white text-blue-600 hover:bg-slate-50"
+                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200" 
+                  : "bg-white text-blue-600 hover:shadow-white/20 hover:shadow-xl"
               )}
             >
               S&apos;inscrire
             </Link>
           </div>
 
-          {/* BOUTON MOBILE */}
-          <button 
-            className="md:hidden p-2 rounded-lg transition-colors cursor-pointer"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="text-slate-900 h-8 w-8" />
-            ) : (
-              <Menu className={cn("h-8 w-8 transition-colors", isScrolled ? "text-slate-900" : "text-white")} />
-            )}
-          </button>
+          {/* TRIGGER MOBILE - On force le texte en noir et une position fixe quand c'est ouvert */}
+<button 
+  className={cn(
+    "md:hidden p-2 transition-all duration-300",
+    isMobileMenuOpen ? "fixed right-6 top-6 z-[100] text-slate-900" : "relative z-[70]"
+  )}
+  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+>
+  {isMobileMenuOpen 
+    ? <X className="h-9 w-9" /> 
+    : <Menu className={cn("h-8 w-8", isScrolled ? "text-slate-900" : "text-white")} />
+  }
+</button>
         </div>
       </nav>
 
-      {/* MENU MOBILE MODERNE (Overlay) */}
-      <div className={cn(
-        "fixed inset-0 z-[60] md:hidden transition-all duration-500",
-        isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-      )}>
-        {/* Backdrop flou */}
-        <div 
-          className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-        
-        {/* Panneau */}
-        <div className={cn(
-          "absolute right-0 top-0 h-full w-[80%] bg-white shadow-2xl transition-transform duration-500 p-8 flex flex-col",
-          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        )}>
-          <div className="flex justify-end mb-8">
-            <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 cursor-pointer">
-              <X className="h-8 w-8 text-slate-900" />
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                href={link.href}
-                className="text-2xl font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer border-b border-slate-100 pb-4"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <Link 
-              href="/register" 
-              className="mt-4 bg-blue-600 text-white text-center py-4 rounded-2xl font-bold text-xl shadow-lg shadow-blue-200 cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(false)}
+      {/* MENU MOBILE MODERNE AVEC ANIMATION */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] md:hidden"
+          >
+            {/* Overlay sombre */}
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+            
+            {/* Panneau latéral */}
+            <motion.div 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute right-0 top-0 h-full w-[85%] bg-white p-8 pt-24 shadow-2xl flex flex-col"
             >
-              S&apos;inscrire
-            </Link>
-          </div>
-        </div>
-      </div>
+              <div className="flex flex-col gap-4">
+                {navLinks.map((link, i) => (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    key={link.name}
+                  >
+                    <Link 
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-between group py-4 border-b border-slate-50"
+                    >
+                      <span className="text-2xl font-black text-slate-800 group-hover:text-blue-600 transition-colors">
+                        {link.name}
+                      </span>
+                      <ChevronRight className="text-slate-300 group-hover:text-blue-600 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mt-auto space-y-6"
+              >
+                <Link 
+                  href="/register"
+                  className="block w-full py-4 bg-blue-600 text-white text-center rounded-2xl font-bold text-lg shadow-xl shadow-blue-100"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Créer un compte
+                </Link>
+                <div className="flex items-center justify-center gap-2 text-slate-400 text-sm font-medium">
+                  <ShieldCheck className="h-4 w-4" /> Plateforme sécurisée HDH Tech
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

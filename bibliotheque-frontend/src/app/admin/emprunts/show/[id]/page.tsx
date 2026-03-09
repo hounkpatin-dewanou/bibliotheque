@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowLeft, Edit, Trash2, Mail, 
-  Calendar, Clock, Book, User, CheckCircle2, 
-  CircleDashed, Loader2, Fingerprint, XCircle,
-  Hash, BookOpen, Info,
+  Calendar, Clock, User, CheckCircle2, 
+  CircleDashed, Loader2, XCircle, BookOpen, Info,
   ArrowRight
 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';

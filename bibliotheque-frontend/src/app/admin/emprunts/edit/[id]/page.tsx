@@ -3,7 +3,6 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import EmpruntForm, { EmpruntFormData } from '@/components/admin/EmpruntForm';
 import { toast, Toaster } from 'react-hot-toast';

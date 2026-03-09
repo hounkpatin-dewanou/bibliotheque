@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Navbar from '@/components/user/NavbarUsager';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Loader2, Book as BookIcon, Filter } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 
 // Interface 

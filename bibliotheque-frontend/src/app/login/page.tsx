@@ -1,5 +1,6 @@
 'use client';
 
+// les imports
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle2, Mail, Lock, ShieldCheck } from 'lucide-react';
@@ -7,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import { AxiosError } from 'axios';
+import AuthNavbar from '@/components/AuthNavbar';
 
 // Définition de l'interface
 interface ApiErrorResponse {
@@ -41,8 +43,8 @@ export default function LoginPage() {
       localStorage.setItem('token', token);
 
       try {
-          
-        // --- NOUVEAU : Récupérer l'ID de l'utilisateur ---
+        
+    //Récupérer l'ID de l'utilisateur 
     // On appelle l'endpoint qui liste les utilisateurs en filtrant par email
     // Ou si tu as un endpoint /api/me c'est encore mieux. 
     // Ici on cherche l'utilisateur par son email :
@@ -90,6 +92,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-white">
+      {/* On affiche la Navbar uniquement en dessous du breakpoint 'lg'. 
+         lg:hidden signifie : cache-moi quand l'écran est large.
+      */}
+      <div className="lg:hidden">
+        <AuthNavbar/>
+      </div>
       {/* SECTION GAUCHE VISUELLE */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-slate-900">
         <Image 
@@ -116,6 +124,10 @@ export default function LoginPage() {
           <blockquote className="text-5xl font-extralight italic">
             &quot;Lire, c&apos;est voyager ; voyager, c&apos;est lire.&quot;
           </blockquote>
+          <div className="flex items-center gap-4 text-blue-400">
+              <div className="h-[1px] w-12 bg-blue-400" />
+              <p className="font-bold uppercase tracking-widest text-sm text-white">Voctor Hugo</p>
+            </div>
           <div className="flex items-center gap-2 text-sm text-slate-300 font-medium">
             <ShieldCheck className="text-blue-500 h-5 w-5" /> Connexion sécurisée
           </div>

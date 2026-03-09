@@ -30,10 +30,6 @@ interface HydraData<T> {
   'member'?: T[];
 }
 
-interface HydraResponse<T> {
-  'hydra:member'?: T[];
-}
-
 export default function DashboardPage() {
   const [empruntsComplets, setEmpruntsComplets] = useState<Emprunt[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

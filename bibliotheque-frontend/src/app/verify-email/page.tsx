@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Mail, RotateCcw, CheckCircle, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Mail, RotateCcw, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';

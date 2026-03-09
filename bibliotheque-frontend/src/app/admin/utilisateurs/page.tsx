@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   Plus, Search, Eye, Edit, Trash2, 
-  User as UserIcon, Loader2, AlertCircle, ShieldCheck, Mail, Phone
+  User as Loader2, AlertCircle, ShieldCheck, Mail, Phone
 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import { CheckCircle2, XCircle } from 'lucide-react'; // Ajout pour les messages

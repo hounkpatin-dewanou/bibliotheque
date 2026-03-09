@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { 
   Loader2, 
   Calendar, 
-  BookOpen, 
   ArrowLeft, 
   Send, 
   Layers, 
@@ -16,9 +15,8 @@ import {
   AlertCircle,
   Hash
 } from 'lucide-react';
-import Navbar from '@/components/user/NavbarUsager';
 import axiosInstance from '@/lib/axios';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 interface LivreData {
   id: number;
@@ -33,36 +31,13 @@ interface LivreData {
   nb_exemplaires: number;
 }
 
-interface ApiUserResponse {
-  'hydra:member': Array<{
-    id: number;
-    email: string;
-  }>;
-}
-
 interface ApiError {
   detail?: string;
   message?: string;
 }
-
-interface UtilisateurMember {
-  "@id": string;
-  id: number;
-  email: string;
-}
-
-interface UtilisateurCollection {
-  "hydra:member": UtilisateurMember[];
-}
-
 interface Utilisateur {
   id: number;
   email: string;
-}
-
-interface HydraResponse {
-  "hydra:member": Utilisateur[];
-  "hydra:totalItems"?: number;
 }
 
 interface DecodedToken {

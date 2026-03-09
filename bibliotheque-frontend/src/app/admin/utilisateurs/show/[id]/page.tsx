@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowLeft, Edit, Trash2, Mail, 
-  Phone, Shield, User, CheckCircle2, 
+  Phone, CheckCircle2, 
   CircleDashed, BookOpen, Loader2, Fingerprint 
 } from 'lucide-react';
 import axiosInstance from '@/lib/axios';

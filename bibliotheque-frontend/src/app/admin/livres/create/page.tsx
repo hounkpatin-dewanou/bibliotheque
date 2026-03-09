@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import axiosInstance from '@/lib/axios';
 import LivreForm from '@/components/admin/LivreForm';
 import { ILivre } from '@/types/livre';
 import axios from 'axios'; 

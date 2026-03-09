@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { 
-  BarChart3, 
   Users, 
   BookOpen, 
   Clock, 
@@ -10,7 +9,6 @@ import {
   Loader2,
   RefreshCcw,
 } from 'lucide-react';
-import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 
 interface Stats {
