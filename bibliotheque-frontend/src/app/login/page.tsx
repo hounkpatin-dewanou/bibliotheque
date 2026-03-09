@@ -8,7 +8,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import { AxiosError } from 'axios';
-import AuthNavbar from '@/components/AuthNavbar';
 
 // Définition de l'interface
 interface ApiErrorResponse {
@@ -92,12 +91,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-white">
-      {/* On affiche la Navbar uniquement en dessous du breakpoint 'lg'. 
-         lg:hidden signifie : cache-moi quand l'écran est large.
-      */}
-      <div className="lg:hidden">
-        <AuthNavbar/>
-      </div>
       {/* SECTION GAUCHE VISUELLE */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-slate-900">
         <Image 
@@ -126,7 +119,7 @@ export default function LoginPage() {
           </blockquote>
           <div className="flex items-center gap-4 text-blue-400">
               <div className="h-[1px] w-12 bg-blue-400" />
-              <p className="font-bold uppercase tracking-widest text-sm text-white">Voctor Hugo</p>
+              <p className="font-bold uppercase tracking-widest text-sm text-white">Victor Hugo</p>
             </div>
           <div className="flex items-center gap-2 text-sm text-slate-300 font-medium">
             <ShieldCheck className="text-blue-500 h-5 w-5" /> Connexion sécurisée
@@ -195,6 +188,9 @@ export default function LoginPage() {
 
           <p className="text-center text-slate-500 font-medium">
             Pas encore inscrit ? <Link href="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors underline-offset-4 hover:underline">S&apos;inscrire</Link>
+          </p>
+          <p className="text-center text-slate-500 font-medium">
+            Retourner à l&apos;accueil ? <Link href="/" className="text-blue-600 font-bold hover:text-blue-700 transition-colors underline-offset-4 hover:underline">Accueil</Link>
           </p>
         </div>
       </div>

@@ -40,8 +40,10 @@ class RegistrationController extends AbstractController
             $user->setEmail($data->email);
             $user->setNom($data->nom);
             $user->setPrenom($data->prenom);
+            $user->setRoles(["ROLE_USER"]);
 
-            $user->setPassword($hasher->hashPassword($user, $data->password));
+            // On passe le mot de passe en CLAIR, le Listener s'occupera du reste
+            $user->setPassword($data->password);
             $user->setIsVerified(false);
 
             $token = bin2hex(random_bytes(32));

@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { User, Mail, Lock, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import { AxiosError } from 'axios';
-import AuthNavbar from '@/components/AuthNavbar';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({ nom: '', prenom: '', email: '', password: '', confirmPassword: '' });
@@ -26,7 +25,7 @@ export default function RegisterPage() {
 
   setIsLoading(true);
   try {
-    const { confirmPassword, ...dataToSend } = formData;
+    const {...dataToSend } = formData;
     
     // On appelle /api/register (une fois que Symfony le reconnaîtra)
     await axiosInstance.post('/register', dataToSend);
@@ -37,8 +36,8 @@ export default function RegisterPage() {
     setTimeout(() => {
   router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
 }, 2000);
+
   } catch (err) {
-    // Suppression du "any" : on type l'erreur
     const error = err as AxiosError<{ message?: string }>;
     console.error("Erreur d'inscription", error);
     
@@ -101,119 +100,117 @@ export default function RegisterPage() {
       </div>
 
       {/* SECTION DROITE : LE FORMULAIRE */}
-      
-        <div className="pb-12 lg:hidden fixed top-0 left-0 right-0 z-50">
-          <AuthNavbar/>
-        </div>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-slate-50/50">
+        <div className="w-full max-w-md space-y-10">
+          <div className="space-y-2 text-center lg:text-left">
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight">Créer un compte</h2>
+            <p className="text-slate-500 font-medium">Rejoignez notre communauté de lecteurs passionnés.</p>
+          </div>
 
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 pt-100 md:p-16 h-screen overflow-y-auto bg-slate-50/50">
-          <div className="w-full max-w-md space-y-10">
-            <div className="space-y-2 text-center lg:text-left">
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight pt-100">Créer un compte</h2>
-              <p className="text-slate-500 font-medium">Rejoignez notre communauté de lecteurs passionnés.</p>
+          {/* ZONE DE MESSAGE D'ERREUR/SUCCÈS ÉLÉGANTE */}
+          {statusMsg && (
+            <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
+              statusMsg.type === 'error' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+            }`}>
+              {statusMsg.type === 'error' ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
+              <span className="text-sm font-bold">{statusMsg.text}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Prénom</label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input 
+                    type="text" 
+                    placeholder="Jean"
+                    className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
+                    onChange={(e) => setFormData({...formData, prenom: e.target.value})} 
+                    required 
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Nom</label>
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    placeholder="Dupont"
+                    className="w-full px-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
+                    onChange={(e) => setFormData({...formData, nom: e.target.value})} 
+                    required 
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* ZONE DE MESSAGE D'ERREUR/SUCCÈS ÉLÉGANTE */}
-            {statusMsg && (
-              <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
-                statusMsg.type === 'error' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-              }`}>
-                {statusMsg.type === 'error' ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
-                <span className="text-sm font-bold">{statusMsg.text}</span>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 ml-1">Adresse Email</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                <input 
+                  type="email" 
+                  placeholder="nom@exemple.com"
+                  className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
+                  onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                  required 
+                />
               </div>
-            )}
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">Prénom</label>
-                  <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                    <input 
-                      type="text" 
-                      placeholder="Jean"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
-                      onChange={(e) => setFormData({...formData, prenom: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">Nom</label>
-                  <div className="relative group">
-                    <input 
-                      type="text" 
-                      placeholder="Dupont"
-                      className="w-full px-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
-                      onChange={(e) => setFormData({...formData, nom: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">Adresse Email</label>
+                <label className="text-sm font-bold text-slate-700 ml-1">Mot de passe</label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                   <input 
-                    type="email" 
-                    placeholder="nom@exemple.com"
+                    type="password" 
+                    placeholder="••••••••"
                     className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
-                    onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                    onChange={(e) => setFormData({...formData, password: e.target.value})} 
                     required 
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">Mot de passe</label>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                    <input 
-                      type="password" 
-                      placeholder="••••••••"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
-                      onChange={(e) => setFormData({...formData, password: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">Confirmation</label>
-                  <div className="relative group">
-                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                    <input 
-                      type="password" 
-                      placeholder="••••••••"
-                      className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
-                      required 
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700 ml-1">Confirmation</label>
+                <div className="relative group">
+                  <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                  <input 
+                    type="password" 
+                    placeholder="••••••••"
+                    className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 transition-all text-slate-700 shadow-sm"
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} 
+                    required 
+                  />
                 </div>
               </div>
+            </div>
 
-              <button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isLoading ? (
-                  <>Inscription en cours...</>
-                ) : (
-                  <>S&apos;inscrire</>
-                )}
-              </button>
-            </form>
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:bg-blue-400 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isLoading ? (
+                <>Inscription en cours...</>
+              ) : (
+                <>S&apos;inscrire</>
+              )}
+            </button>
+          </form>
 
-            <p className="text-center text-slate-500 font-medium">
-              Déjà inscrit ? <Link href="/login" className="text-blue-600 font-bold hover:text-blue-700 transition-colors underline-offset-4 hover:underline">Se connecter</Link>
-            </p>
-          </div>
+          <p className="text-center text-slate-500 font-medium">
+            Déjà inscrit ? <Link href="/login" className="text-blue-600 font-bold hover:text-blue-700 transition-colors underline-offset-4 hover:underline">Se connecter</Link>
+          </p>
+          <p className="text-center text-slate-500 font-medium">
+            Retourner à l&apos;accueil ? <Link href="/" className="text-blue-600 font-bold hover:text-blue-700 transition-colors underline-offset-4 hover:underline">Accueil</Link>
+          </p>
         </div>
+      </div>
     </div>
   );
 }

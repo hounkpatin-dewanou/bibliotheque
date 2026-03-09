@@ -30,9 +30,15 @@ class PasswordHasherListener
 
     private function hashPassword(Utilisateur $user): void
     {
-        if ($user->getPassword()) {
-            $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
-            $user->setPassword($hashedPassword);
+        $plainPassword = $user->getPassword();
+
+        if ($plainPassword) {
+            // Vérifie si ce n'est pas déjà un hash (pour éviter de rehacher)
+            // Les hashs Symfony commencent généralement par $argon2 ou $2y$
+            if (!str_starts_with($plainPassword, '$2y$') && !str_starts_with($plainPassword, '$argon2')) {
+                $hashedPassword = $this->hasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
+            }
         }
     }
 

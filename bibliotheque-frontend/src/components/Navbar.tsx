@@ -110,8 +110,8 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   className={cn(
-                    "group relative text-sm font-bold tracking-widest transition-colors duration-300",
-                    isActive ? "text-blue-600" : (isScrolled ? "text-slate-600" : "text-white/80")
+                    "group relative text-white font-bold tracking-widest transition-colors duration-300",
+                    isActive ? "text-blue-600" : (isScrolled ? "text-slate-600" : "text-white")
                   )}
                 >
                   {link.name}
@@ -126,7 +126,7 @@ export default function Navbar() {
             <Link
               href="/register"
               className={cn(
-                "px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300",
+                "px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer rounded-full",
                 isScrolled 
                   ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200" 
                   : "bg-white text-blue-600 hover:shadow-white/20 hover:shadow-xl"
